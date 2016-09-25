@@ -1,18 +1,23 @@
 package RBTree;
 
+import javafx.scene.paint.Color;
+
 import java.security.PublicKey;
 
 /**
  * Created by idib on 20.09.16.
  */
-public class Tree<K,V> {
+public class Tree<K extends Comparable<K>,V> {
     private Node<K,V> Root;
 
-    private double distX = 15;
-    private double distY = 10;
+    private double distX = 45;
+    private double distY = 45;
     private double sX = 0;
     private double sY = 0;
 
+    public Tree(){
+
+    }
 
     public Node<K, V> getRoot() {
         return Root;
@@ -76,5 +81,12 @@ public class Tree<K,V> {
 
     public void setSY(double sY) {
         this.sY = sY;
+    }
+
+    public void Insert(K key, V value) {
+        if(Root == null)
+            Root = new Node<K, V>(key,value, Color.BLACK);
+        else
+            Root.Insert(key,value, null);
     }
 }
