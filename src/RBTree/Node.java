@@ -153,11 +153,11 @@ public class Node<K extends Comparable<K>, V> implements Comparable<Node<K, V>> 
         return s;
     }
 
-    public Text GetName(){
+    public Text GetName() {
         Text f = new Text();
         f.setText(Key.toString());
         f.setX(X + Radius + 5);
-        f.setY(Y + Radius/2);
+        f.setY(Y + Radius / 2);
         return f;
     }
 
@@ -184,7 +184,7 @@ public class Node<K extends Comparable<K>, V> implements Comparable<Node<K, V>> 
         deg += Math.PI / 3;
         nX = Node.Radius * Math.cos(deg);
         nY = Node.Radius * Math.sin(deg);
-        res.add(new Line( eX - neX - nX, eY - neY - nY, eX - neX, eY - neY));
+        res.add(new Line(eX - neX - nX, eY - neY - nY, eX - neX, eY - neY));
         return res;
     }
 
@@ -197,44 +197,60 @@ public class Node<K extends Comparable<K>, V> implements Comparable<Node<K, V>> 
         return res;
     }
 
-    public void Insert(K key, V value, Node<K, V> root) {
+    private void Fixed() {
+        if (C == Color.RED) {
+            if (Root == null) {
+                ReСolor();
+                return;
+            }
+            if (Root.C == Color.RED) {
+                if (Root.Root != null && Root.Root.CountRed() == 2) {
+                    Root.Root.ReColorChildren();
+                } else {
+                    if (Root.Root.Left != null && Root.Root.Left.C == Color.RED) {
+                        if (Root.Right != null && Root.Right.C == Color.RED) {
+                            Root.LeftRotation();
+                            Left.Fixed();
+                        } else {
+                            Root.ReСolor();
+                            Root.Root.ReСolor();
+                            Root.Root.RightRotation();
+                        }
+                    } else {
+                        if (Root.Root.Right != null && Root.Root.Right.C == Color.RED) {
+                            if (Root.Left != null && Root.Left.C == Color.RED) {
+                                Root.RightRotation();
+                                Right.Fixed();
+                            } else {
+                                Root.ReСolor();
+                                Root.Root.ReСolor();
+                                Root.Root.LeftRotation();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (Root != null)
+            Root.Fixed();
+    }
+
+    public void Insert(K key, V value) {
         if (key.compareTo(Key) >= 0) {
             if (Right != null) {
-                Right.Insert(key, value, this);
+                Right.Insert(key, value);
+                return;
             } else {
-                Right = new Node<>(key, value);
+                Right = new Node<>(key, value, this);
+                Right.Fixed();
             }
         } else {
             if (Left != null) {
-                Left.Insert(key, value, this);
+                Left.Insert(key, value);
+                return;
             } else {
-                Left = new Node<>(key, value);
-            }
-        }
-        if (C == Color.RED) {
-            int r = root.CountRed();
-            if (r == 2) {
-                root.ReColorChildren();
-                if (Left.C == Color.RED) {
-                    Left.ReСolor();
-                } else {
-                    Right.ReСolor();
-                }
-            } else {
-                if (root.Left!=null && root.Left.C == Color.RED) {
-                    if (Right.C == Color.RED)
-                        LeftRotation();
-                    ReСolor();
-                    Root.ReСolor();
-                    root.RightRotation();
-                } 
-                if (root.Right!=null && root.Right.C == Color.RED){
-                    if (Left.C == Color.RED)
-                        RightRotation();
-                    ReСolor();
-                    Root.ReСolor();
-                    root.LeftRotation();
-                }
+                Left = new Node<>(key, value, this);
+                Left.Fixed();
             }
         }
     }
@@ -257,11 +273,59 @@ public class Node<K extends Comparable<K>, V> implements Comparable<Node<K, V>> 
         Right.ReСolor();
     }
 
+
     private void LeftRotation() {
-        // TODO: 24.09.16
+        if (Root == null) {
+            K k = Key;
+            Key = Right.Key;
+            V v = Value;
+            Value = Right.Value;
+            C = Color.BLACK;
+            Node<K, V> L = Left;
+            Node<K, V> R = Right;
+            Right = R.Right;
+            Right.Root = this;
+            Left = new Node<K, V>(k, v, Color.RED);
+            Left.Root = this;
+            Left.Left = L;
+            Left.Right = R.Left;
+        } else {
+            if (Root.Left == this)
+                Root.Left = Right;
+            else
+                Root.Right = Right;
+            Right.Root = Root;
+            Root = Right;
+            Node<K, V> s;
+            s = Right.Left;
+            Right.Left = this;
+            Right = s;
+        }
     }
 
     private void RightRotation() {
-        // TODO: 24.09.16
+        if (Root == null) {
+            K k = Key;
+            Key = Left.Key;
+            V v = Value;
+            Value = Left.Value;
+            Node<K, V> L = Left;
+            Node<K, V> R = Right;
+            Left = L.Left;
+            Right = new Node<K, V>(k, v, Color.RED);
+            Right.Left = L.Right;
+            Right.Right = R;
+        } else {
+            if (Root.Left == this)
+                Root.Left = Left;
+            else
+                Root.Right = Left;
+            Left.Root = Root;
+            Root = Left;
+            Node<K, V> s;
+            s = Left.Right;
+            Left.Right = this;
+            Left = s;
+        }
     }
 }

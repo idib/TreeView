@@ -7,15 +7,15 @@ import java.security.PublicKey;
 /**
  * Created by idib on 20.09.16.
  */
-public class Tree<K extends Comparable<K>,V> {
-    private Node<K,V> Root;
+public class Tree<K extends Comparable<K>, V> {
+    private Node<K, V> Root;
 
     private double distX = 45;
     private double distY = 45;
     private double sX = 0;
     private double sY = 0;
 
-    public Tree(){
+    public Tree() {
 
     }
 
@@ -27,28 +27,30 @@ public class Tree<K extends Comparable<K>,V> {
         Root = root;
     }
 
-    public void refreshXY(){
-        refreshX(Root, sX);
-        refreshY(Root, sY);
+    public void refreshXY() {
+        if (Root != null) {
+            refreshX(Root, sX);
+            refreshY(Root, sY);
+        }
     }
 
-    private double refreshX(Node<K,V> n, double curX){
+    private double refreshX(Node<K, V> n, double curX) {
         double s = curX;
-        if(n.TryLeft())
-            s = refreshX(n.getLeft(),s);
+        if (n.TryLeft())
+            s = refreshX(n.getLeft(), s);
         n.setX(s);
-        if(n.TryRight())
-            return refreshX(n.getRight(),s + distX);
+        if (n.TryRight())
+            return refreshX(n.getRight(), s + distX);
         else
             return s + distX;
     }
 
-    private void refreshY(Node<K,V> n, double curY){
+    private void refreshY(Node<K, V> n, double curY) {
         n.setY(curY);
-        if(n.TryLeft())
+        if (n.TryLeft())
             refreshY(n.getLeft(), curY + distY);
-        if(n.TryRight())
-            refreshY(n.getRight(),curY + distY);
+        if (n.TryRight())
+            refreshY(n.getRight(), curY + distY);
     }
 
     public double getDistX() {
@@ -84,9 +86,9 @@ public class Tree<K extends Comparable<K>,V> {
     }
 
     public void Insert(K key, V value) {
-        if(Root == null)
-            Root = new Node<K, V>(key,value, Color.BLACK);
+        if (Root == null)
+            Root = new Node<K, V>(key, value, Color.BLACK);
         else
-            Root.Insert(key,value, null);
+            Root.Insert(key, value);
     }
 }
