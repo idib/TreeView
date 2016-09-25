@@ -2,12 +2,12 @@ package View;
 
 import RBTree.*;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Ellipse;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -17,35 +17,60 @@ public class Main extends Application {
     private Tree<Integer,Integer> T;
 
 
+    private void refreshTree(Node<Integer,Integer> t)
+    {
 
+        TreePanel.getChildren().addAll(t.getShape());
+        if (t.TryLeft())
+            refreshTree(t.getLeft());
+        if (t.TryRight())
+            refreshTree(t.getRight());
+    }
 
+    private void refreshTree(){
+        T.refreshXY();
+        TreePanel.getChildren().clear();
+        refreshTree(T.getRoot());
+    }
+
+    private TextField TextKey;
+    private Group TreePanel;
+    private Group StagePanel;
+    private Scene scene;
+    private Button btn;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Group root = new Group();
+        T = new Tree<>();
+        T.setSX(15);
+        T.setSY(15);
 
-        Ellipse ellipse = new Ellipse();
-        ellipse.setCenterX(180.0f);
-        ellipse.setCenterY(150.0f);
+        StagePanel = new Group();
 
-        // Radius X
-        ellipse.setRadiusX(120.0f);
+        TreePanel = new Group();
+        TreePanel.setLayoutX(0);
+        TreePanel.setLayoutY(60);
 
-        // Radius Y
-        ellipse.setRadiusY(80.0f);
+        TextKey = new TextField();
+        TextKey.setMaxWidth(150);
 
-        // Fill color.
-        ellipse.setFill(Color.CORNFLOWERBLUE);
+        btn = new Button();
+        btn.setLayoutX(150);
+        btn.setText("Добавить");
+        btn.setOnAction(new EventHandler<ActionEvent>() {
 
-        // Rotate 30 degrees
-        ellipse.setRotate(30);
+            @Override
+            public void handle(ActionEvent event) {
+                T.Insert(Integer.parseInt(TextKey.getText()),Integer.parseInt(TextKey.getText()));
+                refreshTree();
+            }
+        });
 
-        root.getChildren().add(ellipse);
-
-        Scene scene = new Scene(root, 400, 250);
-
-        primaryStage.setTitle("JavaFX Ellipse (o7planning.org)");
-
+        StagePanel.getChildren().add(TextKey);
+        StagePanel.getChildren().add(btn);
+        StagePanel.getChildren().add(TreePanel);
+        scene = new Scene(StagePanel, 400, 250);
+        primaryStage.setTitle("RBTree");
         primaryStage.setScene(scene);
         primaryStage.show();
 
