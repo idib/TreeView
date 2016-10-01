@@ -196,7 +196,7 @@ public class Node<K extends Comparable<K>, V> implements Comparable<Node<K, V>> 
             res.addAll(getLP(X, Y, Right.X, Right.Y));
         return res;
     }
-
+// 100 200 150 500 1000 11 0 16 15 18 17
     private void Fixed() {
         if (C == Color.RED) {
             if (Root == null) {
@@ -272,7 +272,6 @@ public class Node<K extends Comparable<K>, V> implements Comparable<Node<K, V>> 
         Left.ReСolor();
         Right.ReСolor();
     }
-
 
     private void LeftRotation() {
         if (Root == null) {

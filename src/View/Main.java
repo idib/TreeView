@@ -1,8 +1,6 @@
 package View;
 
 import RBTree.*;
-import com.sun.xml.internal.bind.v2.TODO;
-import com.sun.xml.internal.org.jvnet.fastinfoset.sax.PrimitiveTypeContentHandler;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -16,13 +14,16 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
+    private TextField TextKey;
+    private Group TreePanel;
+    private Group StagePanel;
+    private Scene scene;
+    private Tree<Integer, Integer> T;
+    private double SY = 15;
+    private double SX = 15;
 
 
-    private Tree<Integer,Integer> T;
-
-
-    private void refreshTree(Node<Integer,Integer> t)
-    {
+    private void refreshTree(Node<Integer, Integer> t) {
 
         TreePanel.getChildren().addAll(t.getShape());
         if (t.TryLeft())
@@ -31,35 +32,29 @@ public class Main extends Application {
             refreshTree(t.getRight());
     }
 
-    private void refreshTree(){
+    private void refreshTree() {
         T.refreshXY();
         TreePanel.getChildren().clear();
         if (T.getRoot() != null)
             refreshTree(T.getRoot());
     }
 
-    private void TNew(){
+    private void TNew() {
         T = new Tree<>();
-        T.setSX(15);
-        T.setSY(15);
+        T.setSX(SX);
+        T.setSY(SY);
         refreshTree();
     }
 
-    private TextField TextKey;
-    private Group TreePanel;
-    private Group StagePanel;
-    private Scene scene;
-
-
-    private void InsertElem(){
+    private void InsertElem() {
         System.out.println(TextKey.getText());
-        T.Insert(Integer.parseInt(TextKey.getText()),Integer.parseInt(TextKey.getText()));
+        T.Insert(Integer.parseInt(TextKey.getText()), Integer.parseInt(TextKey.getText()));
         refreshTree();
         TextKey.setText("");
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
         StagePanel = new Group();
 
         TreePanel = new Group();
@@ -71,8 +66,7 @@ public class Main extends Application {
         TextKey.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent event) {
-                if (event.getCode().equals(KeyCode.ENTER))
-                {
+                if (event.getCode().equals(KeyCode.ENTER)) {
                     InsertElem();
                 }
             }
@@ -125,7 +119,6 @@ public class Main extends Application {
         primaryStage.show();
 
     }
-
 
 
     public static void main(String[] args) {
