@@ -87,8 +87,17 @@ public class Tree<K extends Comparable<K>, V> {
 
     public void Insert(K key, V value) {
         if (Root == null)
-            Root = new Node<K, V>(key, value, Color.BLACK);
+        {
+            Node<K,V> t = new Node<K, V>(true);
+            Root = new Node<K, V>(key, value, Color.BLACK,t);
+            Root.T = this;
+        }
         else
             Root.Insert(key, value);
+    }
+
+    public void Del(K key)
+    {
+        Root.Delete(key);
     }
 }

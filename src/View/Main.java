@@ -40,6 +40,7 @@ public class Main extends Application {
     }
 
     private void TNew() {
+        System.out.println("New Tree");
         T = new Tree<>();
         T.setSX(SX);
         T.setSY(SY);
@@ -47,8 +48,16 @@ public class Main extends Application {
     }
 
     private void InsertElem() {
-        System.out.println(TextKey.getText());
+        System.out.println("+ " + TextKey.getText());
         T.Insert(Integer.parseInt(TextKey.getText()), Integer.parseInt(TextKey.getText()));
+        refreshTree();
+        TextKey.setText("");
+    }
+
+
+    private void DelElem() {
+        System.out.println("- " + TextKey.getText());
+        T.Del(Integer.parseInt(TextKey.getText()));
         refreshTree();
         TextKey.setText("");
     }
@@ -68,6 +77,8 @@ public class Main extends Application {
             public void handle(KeyEvent event) {
                 if (event.getCode().equals(KeyCode.ENTER)) {
                     InsertElem();
+                } else if (event.getCode().equals(KeyCode.DELETE)) {
+                    DelElem();
                 }
             }
         });
@@ -89,7 +100,7 @@ public class Main extends Application {
 
             @Override
             public void handle(ActionEvent event) {
-                // TODO: 25.09.16 delete Element
+                DelElem();
             }
         });
 
@@ -113,7 +124,7 @@ public class Main extends Application {
         StagePanel.getChildren().add(btnDelete);
         StagePanel.getChildren().add(btnNew);
         StagePanel.getChildren().add(TreePanel);
-        scene = new Scene(StagePanel, 400, 250);
+        scene = new Scene(StagePanel, 600, 300);
         primaryStage.setTitle("RBTree");
         primaryStage.setScene(scene);
         primaryStage.show();

@@ -7,6 +7,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
 
+import java.security.PublicKey;
 import java.util.ArrayList;
 
 /**
@@ -18,10 +19,12 @@ public class Node<K extends Comparable<K>, V> implements Comparable<Node<K, V>> 
     private K Key;
     private V Value;
     private Color C;
+    private boolean Nil = false;
 
     private Node<K, V> Root;
     private Node<K, V> Left;
     private Node<K, V> Right;
+    public Tree<K, V> T;
 
     private double X;
     private double Y;
@@ -32,6 +35,17 @@ public class Node<K extends Comparable<K>, V> implements Comparable<Node<K, V>> 
         X = 0;
         Y = 0;
         C = Color.RED;
+    }
+
+    public Node(boolean t) {
+        if (t) {
+            Nil = true;
+            C = Color.BLACK;
+        } else {
+            X = 0;
+            Y = 0;
+            C = Color.RED;
+        }
     }
 
     public Node(K key, V value) {
@@ -51,12 +65,33 @@ public class Node<K extends Comparable<K>, V> implements Comparable<Node<K, V>> 
         C = Color.RED;
     }
 
+    public Node(K key, V value, Node<K, V> root, Node<K, V> n) {
+        X = 0;
+        Y = 0;
+        Key = key;
+        Value = value;
+        Root = root;
+        C = Color.RED;
+        Right = n;
+        Left = n;
+    }
+
     public Node(K key, V value, Color c) {
         X = 0;
         Y = 0;
         Key = key;
         Value = value;
         C = c;
+    }
+
+    public Node(K key, V value, Color c, Node<K, V> n) {
+        X = 0;
+        Y = 0;
+        Key = key;
+        Value = value;
+        C = c;
+        Right = n;
+        Left = n;
     }
 
     public K getKey() {
@@ -100,31 +135,25 @@ public class Node<K extends Comparable<K>, V> implements Comparable<Node<K, V>> 
     }
 
     public Node<K, V> getLeft() {
-        return Left;
-    }
-
-    public void setLeft(Node<K, V> left) {
-        Left = left;
+        if (Left.Nil)
+            return null;
+        else
+            return Left;
     }
 
     public Node<K, V> getRight() {
-        return Right;
-    }
-
-    public void setRight(Node<K, V> right) {
-        Right = right;
-    }
-
-    public boolean TryChildren() {
-        return Left != null || Right != null;
+        if (Right.Nil)
+            return null;
+        else
+            return Right;
     }
 
     public boolean TryLeft() {
-        return Left != null;
+        return !Left.Nil;
     }
 
     public boolean TryRight() {
-        return Right != null;
+        return !Right.Nil;
     }
 
     public double getX() {
@@ -166,6 +195,16 @@ public class Node<K extends Comparable<K>, V> implements Comparable<Node<K, V>> 
         res.add(getEllipse());
         res.addAll(getLinePoint());
         res.add(GetName());
+        Text f = new Text();
+        if (Root != null) {
+            f.setText(Root.Key.toString());
+        } else {
+
+            f.setText("nil");
+        }
+        f.setX(X + Radius + 5);
+        f.setY(Y + Radius * 1.5);
+        res.add(f);
         return res;
     }
 
@@ -190,67 +229,82 @@ public class Node<K extends Comparable<K>, V> implements Comparable<Node<K, V>> 
 
     public ArrayList<Line> getLinePoint() {
         ArrayList<Line> res = new ArrayList<>();
-        if (Left != null)
+        if (TryLeft())
             res.addAll(getLP(X, Y, Left.X, Left.Y));
-        if (Right != null)
+        if (TryRight())
             res.addAll(getLP(X, Y, Right.X, Right.Y));
         return res;
     }
-// 100 200 150 500 1000 11 0 16 15 18 17
-    private void Fixed() {
-        if (C == Color.RED) {
-            if (Root == null) {
-                ReСolor();
-                return;
-            }
-            if (Root.C == Color.RED) {
-                if (Root.Root != null && Root.Root.CountRed() == 2) {
-                    Root.Root.ReColorChildren();
+
+    private void Fixed(Node<K, V> z) {
+        Node<K, V> y;
+        while (z.Root != null && z.Root.C == Color.RED) {
+            if (z.Root == z.Root.Root.Left) {
+                y = z.Root.Root.Right;
+                if (y.C == Color.RED) {
+                    z.Root.C = Color.BLACK;
+                    y.C = Color.BLACK;
+                    z.Root.Root.C = Color.RED;
+                    z = z.Root.Root;
                 } else {
-                    if (Root.Root.Left != null && Root.Root.Left.C == Color.RED) {
-                        if (Root.Right != null && Root.Right.C == Color.RED) {
-                            Root.LeftRotation();
-                            Left.Fixed();
-                        } else {
-                            Root.ReСolor();
-                            Root.Root.ReСolor();
-                            Root.Root.RightRotation();
-                        }
-                    } else {
-                        if (Root.Root.Right != null && Root.Root.Right.C == Color.RED) {
-                            if (Root.Left != null && Root.Left.C == Color.RED) {
-                                Root.RightRotation();
-                                Right.Fixed();
-                            } else {
-                                Root.ReСolor();
-                                Root.Root.ReСolor();
-                                Root.Root.LeftRotation();
-                            }
-                        }
+                    if (z == z.Root.Right) {
+                        z = z.Root;
+                        z.LeftRotation();
                     }
+                    z.Root.C = Color.BLACK;
+                    z.Root.Root.C = Color.RED;
+                    z.Root.Root.RightRotation();
+                }
+            } else {
+                y = z.Root.Root.Left;
+                if (y.C == Color.RED) {
+                    z.Root.C = Color.BLACK;
+                    y.C = Color.BLACK;
+                    z.Root.Root.C = Color.RED;
+                    z = z.Root.Root;
+                } else {
+                    if (z == z.Root.Left) {
+                        z = z.Root;
+                        z.RightRotation();
+                    }
+                    z.Root.C = Color.BLACK;
+                    z.Root.Root.C = Color.RED;
+                    z.Root.Root.LeftRotation();
                 }
             }
         }
-        if (Root != null)
-            Root.Fixed();
+        while (z.Root != null)
+            z = z.Root;
+        z.C = Color.BLACK;
+    }
+
+    private void Transplant(Node<K, V> a, Node<K, V> b) {
+        if (a.Root == null) {
+            a.T.setRoot(b);
+        } else if (a == a.Root.Left) {
+            a.Root.Left = b;
+        } else {
+            a.Root.Right = b;
+        }
+        b.Root = a.Root;
     }
 
     public void Insert(K key, V value) {
         if (key.compareTo(Key) >= 0) {
-            if (Right != null) {
+            if (Right.Nil) {
+                Right = new Node<>(key, value, this, Right);
+                Fixed(Right);
+            } else {
                 Right.Insert(key, value);
                 return;
-            } else {
-                Right = new Node<>(key, value, this);
-                Right.Fixed();
             }
         } else {
-            if (Left != null) {
+            if (Left.Nil) {
+                Left = new Node<>(key, value, this, Left);
+                Fixed(Left);
+            } else {
                 Left.Insert(key, value);
                 return;
-            } else {
-                Left = new Node<>(key, value, this);
-                Left.Fixed();
             }
         }
     }
@@ -260,71 +314,159 @@ public class Node<K extends Comparable<K>, V> implements Comparable<Node<K, V>> 
         return Key.compareTo(o.Key);
     }
 
-    private int CountRed() {
-        int r = 0;
-        if (Left != null && Left.C == Color.RED) r++;
-        if (Right != null && Right.C == Color.RED) r++;
-        return r;
+    public Node<K, V> Min() {
+        if (Left.Nil)
+            return this;
+        else
+            return Left.Min();
     }
 
-    private void ReColorChildren() {
-        ReСolor();
-        Left.ReСolor();
-        Right.ReСolor();
+    public Node<K, V> Max() {
+        if (Right.Nil)
+            return this;
+        else
+            return Right.Max();
+    }
+
+    public void Delete(K key) {
+        int r = key.compareTo(Key);
+        if (r == 0) {
+            Node<K, V> y = this;
+            Color OC = y.C;
+            Node<K, V> x;
+            if (Left.Nil) {
+                x = Right;
+                x.Root = Right;
+                Transplant(this, Right);
+            } else if (Right.Nil) {
+                x = Left;
+                x.Root = Left;
+                Transplant(this, Left);
+            } else {
+                y = Right.Min();
+                OC = y.C;
+                x = y.Right;
+                x.Root = y;
+                if (y.Root != this) {
+                    Transplant(y, y.Right);
+                    y.Right = Right;
+                    y.Right.Root = y;
+                }
+                Transplant(this, y);
+                y.Left = Left;
+                y.Left.Root = y;
+                y.C = C;
+            }
+            if (OC == Color.BLACK) {
+                DelFix(x);
+            }
+            return;
+        } else {
+            if (r > 0) {
+                if (Right != null) {
+                    Right.Delete(key);
+                    return;
+                }
+            } else {
+                if (Left != null) {
+                    Left.Delete(key);
+                    return;
+                }
+            }
+        }
+    }
+
+    private void DelFix(Node<K, V> x) {
+        Node<K, V> w = new Node<K, V>();
+        while (x.Root != null && x.C == Color.BLACK) {
+            if (x == x.Root.Left) {
+                w = x.Root.Right;
+                if (w.C == Color.RED) {
+                    w.C = Color.BLACK;
+                    x.Root.C = Color.RED;
+                    x.Root.LeftRotation();        // try;
+                    w = x.Root.Right;
+                }
+                if (w.Left.C == Color.BLACK && w.Right.C == Color.BLACK) {
+                    w.C = Color.RED;
+                    x = x.Root;
+                } else {
+                    if (w.Right.C == Color.BLACK) {
+                        w.Left.C = Color.BLACK;
+                        w.C = Color.RED;
+                        w.RightRotation();
+                        w = x.Root.Right;
+                    }
+                    w.C = x.Root.C;
+                    x.Root.C = Color.BLACK;
+                    w.Right.C = Color.BLACK;
+                    x.Root.LeftRotation();
+                    while (x.Root != null)
+                        x = x.Root;
+                }
+            } else {
+                w = x.Root.Left;
+                if (w.C == Color.RED) {
+                    w.C = Color.BLACK;
+                    x.Root.C = Color.RED;
+                    x.Root.LeftRotation();        // try;
+                    w = x.Root.Left;
+                }
+                if (w.Right.C == Color.BLACK && w.Left.C == Color.BLACK) {
+                    w.C = Color.RED;
+                    x = x.Root;
+                } else {
+                    if (w.Left.C == Color.BLACK) {
+                        w.Right.C = Color.BLACK;
+                        w.C = Color.RED;
+                        w.LeftRotation();
+                        w = x.Root.Left;
+                    }
+                    w.C = x.Root.C;
+                    x.Root.C = Color.BLACK;
+                    w.Left.C = Color.BLACK;
+                    x.Root.RightRotation();
+                    while (x.Root != null)
+                        x = x.Root;
+                }
+            }
+        }
+        x.C = Color.BLACK;
     }
 
     private void LeftRotation() {
+        Node<K, V> y = Right;
+        Right = y.Left;
+        if (!y.Left.Nil)
+            y.Left.Root = this;
+        y.Root = Root;
         if (Root == null) {
-            K k = Key;
-            Key = Right.Key;
-            V v = Value;
-            Value = Right.Value;
-            C = Color.BLACK;
-            Node<K, V> L = Left;
-            Node<K, V> R = Right;
-            Right = R.Right;
-            Right.Root = this;
-            Left = new Node<K, V>(k, v, Color.RED);
-            Left.Root = this;
-            Left.Left = L;
-            Left.Right = R.Left;
-        } else {
-            if (Root.Left == this)
-                Root.Left = Right;
-            else
-                Root.Right = Right;
-            Right.Root = Root;
-            Root = Right;
-            Node<K, V> s;
-            s = Right.Left;
-            Right.Left = this;
-            Right = s;
-        }
+            T.setRoot(y);
+            y.T = T;
+            T = null;
+        } else if (this == Root.Left)
+            Root.Left = y;
+        else
+            Root.Right = y;
+        y.Left = this;
+        Root = y;
     }
 
     private void RightRotation() {
+        Node<K, V> y = Left;
+        Left = y.Right;
+        if (!y.Right.Nil)
+            y.Right.Root = this;
+        y.Root = Root;
         if (Root == null) {
-            K k = Key;
-            Key = Left.Key;
-            V v = Value;
-            Value = Left.Value;
-            Node<K, V> L = Left;
-            Node<K, V> R = Right;
-            Left = L.Left;
-            Right = new Node<K, V>(k, v, Color.RED);
-            Right.Left = L.Right;
-            Right.Right = R;
-        } else {
-            if (Root.Left == this)
-                Root.Left = Left;
-            else
-                Root.Right = Left;
-            Left.Root = Root;
-            Root = Left;
-            Node<K, V> s;
-            s = Left.Right;
-            Left.Right = this;
-            Left = s;
-        }
+            T.setRoot(y);
+            y.T = T;
+            T = null;
+        } else if (this == Root.Right)
+            Root.Right = y;
+        else
+            Root.Left = y;
+        y.Right = this;
+        Root = y;
     }
 }
