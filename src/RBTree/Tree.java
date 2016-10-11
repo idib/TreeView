@@ -16,7 +16,7 @@ public class Tree<K extends Comparable<K>, V> {
     private double sY = 0;
 
     public Tree() {
-
+        Root = new Node<K, V>(true, this);
     }
 
     public Node<K, V> getRoot() {
@@ -86,18 +86,10 @@ public class Tree<K extends Comparable<K>, V> {
     }
 
     public void Insert(K key, V value) {
-        if (Root == null)
-        {
-            Node<K,V> t = new Node<K, V>(true, this);
-            Root = new Node<K, V>(key, value, Color.BLACK,t, this);
-            Root.T = this;
-        }
-        else
             Root.Insert(key, value);
     }
 
-    public void Del(K key)
-    {
+    public void Del(K key) {
         Root.Delete(key);
     }
 }

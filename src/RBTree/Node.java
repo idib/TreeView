@@ -37,7 +37,7 @@ public class Node<K extends Comparable<K>, V> implements Comparable<Node<K, V>> 
         C = Color.RED;
     }
 
-    public Node(boolean t, Tree<K,V> r) {
+    public Node(boolean t, Tree<K, V> r) {
 
         T = r;
         if (t) {
@@ -50,26 +50,7 @@ public class Node<K extends Comparable<K>, V> implements Comparable<Node<K, V>> 
         }
     }
 
-    public Node(K key, V value, Tree<K,V> r) {
-        X = 0;
-        Y = 0;
-        Key = key;
-        Value = value;
-        C = Color.RED;
-        T = r;
-    }
-
-    public Node(K key, V value, Node<K, V> root, Tree<K,V> r) {
-        X = 0;
-        Y = 0;
-        Key = key;
-        Value = value;
-        Root = root;
-        C = Color.RED;
-        T = r;
-    }
-
-    public Node(K key, V value, Node<K, V> root, Node<K, V> n , Tree<K,V> r) {
+    public Node(K key, V value, Node<K, V> root, Node<K, V> n, Tree<K, V> r) {
         X = 0;
         Y = 0;
         Key = key;
@@ -81,20 +62,12 @@ public class Node<K extends Comparable<K>, V> implements Comparable<Node<K, V>> 
         T = r;
     }
 
-    public Node(K key, V value, Color c,Tree<K,V> r) {
+    public Node(K key, V value, Color c, Node<K, V> root, Node<K, V> n, Tree<K, V> r) {
         X = 0;
         Y = 0;
         Key = key;
         Value = value;
-        C = c;
-        T = r;
-    }
-
-    public Node(K key, V value, Color c, Node<K, V> n,Tree<K,V> r) {
-        X = 0;
-        Y = 0;
-        Key = key;
-        Value = value;
+        Root = root;
         C = c;
         Right = n;
         Left = n;
@@ -157,14 +130,14 @@ public class Node<K extends Comparable<K>, V> implements Comparable<Node<K, V>> 
 
     public boolean TryLeft() {
         if (Left != null)
-        return !Left.Nil;
-        return  false;
+            return !Left.Nil;
+        return false;
     }
 
     public boolean TryRight() {
         if (Right != null)
-        return !Right.Nil;
-        return  false;
+            return !Right.Nil;
+        return false;
     }
 
     public double getX() {
@@ -203,6 +176,7 @@ public class Node<K extends Comparable<K>, V> implements Comparable<Node<K, V>> 
 
     public ArrayList<Shape> getShape() {
         ArrayList<Shape> res = new ArrayList<>();
+        if (Nil) return res;
         res.add(getEllipse());
         res.addAll(getLinePoint());
         res.add(GetName());
@@ -291,7 +265,10 @@ public class Node<K extends Comparable<K>, V> implements Comparable<Node<K, V>> 
     }
 
     public void Insert(K key, V value) {
-        if (key.compareTo(Key) >= 0) {
+        if (Nil) {
+            T.setRoot(new Node<>(key, value, Color.BLACK, (Node<K, V>) null, this, T));
+
+        } else if (key.compareTo(Key) > 0) {
             if (Right.Nil) {
                 Right = new Node<>(key, value, this, Right, T);
                 Right.T = T;
@@ -301,7 +278,7 @@ public class Node<K extends Comparable<K>, V> implements Comparable<Node<K, V>> 
                 Right.Insert(key, value);
                 return;
             }
-        } else {
+        } else if (key.compareTo(Key) < 0){
             if (Left.Nil) {
                 Left.T = T;
                 Left = new Node<>(key, value, this, Left, T);
@@ -448,7 +425,6 @@ public class Node<K extends Comparable<K>, V> implements Comparable<Node<K, V>> 
         if (Root == null) {
             T.setRoot(y);
             y.T = T;
-            T = null;
         } else if (this == Root.Left)
             Root.Left = y;
         else
@@ -466,7 +442,6 @@ public class Node<K extends Comparable<K>, V> implements Comparable<Node<K, V>> 
         if (Root == null) {
             T.setRoot(y);
             y.T = T;
-            T = null;
         } else if (this == Root.Right)
             Root.Right = y;
         else
@@ -475,18 +450,17 @@ public class Node<K extends Comparable<K>, V> implements Comparable<Node<K, V>> 
         Root = y;
     }
 
-    public ArrayList<K> findPath(K key){
+    public ArrayList<K> findPath(K key) {
         ArrayList<K> res = new ArrayList<K>();
         int r = key.compareTo(Key);
-        if (r == 0 ){
+        if (r == 0) {
             return new ArrayList<>();
-        }
-        else if (r > 0){
+        } else if (r > 0) {
             if (!Right.Nil)
                 res = Right.findPath(key);
             res.add(Key);
             return res;
-        }else{
+        } else {
 
             if (!Left.Nil)
                 res = Left.findPath(key);
