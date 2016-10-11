@@ -12,6 +12,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+
 public class Main extends Application {
 
     private TextField TextKey;
@@ -57,6 +59,10 @@ public class Main extends Application {
 
     private void DelElem() {
         System.out.println("- " + TextKey.getText());
+        ArrayList<Integer> s = T.getRoot().findPath(Integer.parseInt(TextKey.getText()));
+        for (Integer integer : s) {
+            T.Del(integer);
+        }
         T.Del(Integer.parseInt(TextKey.getText()));
         refreshTree();
         TextKey.setText("");

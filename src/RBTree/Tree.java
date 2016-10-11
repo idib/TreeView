@@ -88,8 +88,8 @@ public class Tree<K extends Comparable<K>, V> {
     public void Insert(K key, V value) {
         if (Root == null)
         {
-            Node<K,V> t = new Node<K, V>(true);
-            Root = new Node<K, V>(key, value, Color.BLACK,t);
+            Node<K,V> t = new Node<K, V>(true, this);
+            Root = new Node<K, V>(key, value, Color.BLACK,t, this);
             Root.T = this;
         }
         else
